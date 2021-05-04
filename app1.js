@@ -9,6 +9,7 @@ const port 				= "3001";
 var building			=[];
 var b_coord				=[];
 var offices 			=[];
+var finalmap			=[];
 
 //control of approach in 'eating' terms.
 const Rm1C		=true;
@@ -19,7 +20,6 @@ const Rp1Cp1	=false;
 
 //declare a function to read the file.
 function lets_read_file(filename){
-	console.log(`roger that! beginning to read the file ${filename}`);
 	
 	var rows = fs_lib.readFileSync(filename,'utf-8').split('\n');
 	console.log(`gathered content (${rows.length})`);
@@ -46,6 +46,7 @@ function lets_read_file(filename){
 
 	print_offices();
 
+	remap_final();
 
 }
 
@@ -53,21 +54,24 @@ function lets_read_file(filename){
 //declare the function to read 1 and 0s
 function find_1_0(){
 	var _row	=	0;
-	building.forEach((segment)=>{
+	building.forEach((segment, segment_i)=>{
 		segment		= String(segment);
 		segment		= segment.split(',');
 		var _col 	= 0;
-		segment.forEach((qbicle)=>{
+		let current_row = [];
+		segment.forEach((qbicle, qbicle_i)=>{
 			//save the coordenates for this position in the file only if 1 is found.
 			if(qbicle >= 1){
 				let this_coord	=	String(_row) + ','+String(_col);
 				if (b_coord.indexOf(this_coord)<0){
 					b_coord.push(this_coord);
 				}
-			}
+				current_row[qbicle_i] = "111";
+			}else current_row[qbicle_i] = "000";
+			
 			_col 	= _col +1;
 		});
-
+		finalmap[segment_i] = current_row;
 		_row 	= _row +1;
 	})
 	building = []; //clear contents.
@@ -79,6 +83,26 @@ function print_1_0(){
 	})
 }
 
+function remap_final(){
+
+	draw_map('initial map');
+
+	offices.forEach((office,office_i)=>{
+		office.forEach((qbicle,qbicle_i)=>{
+			let this_pair = String(qbicle).split(',');
+			finalmap[this_pair[0]][this_pair[1]] = office_i+101;
+		});
+	});
+
+	draw_map('final map after office-check');
+}
+
+function draw_map(this_phase){
+	console.log(this_phase);
+	finalmap.forEach((this_row,row_i)=>{
+		console.log('['+this_row +']');
+	});
+}
 
 //go through the collected coordinates (Row, Col) and find relatives.
 //we use pointers to see how to move.
@@ -364,10 +388,7 @@ const my_server = http_lib.createServer((req,res)=>{
 	if(url_object.readf =="yes"){
 		console.log('received, will read the file');
 		lets_read_file('my_file.txt');
-	}else
-	{
-		console.log(`not heard from you -${url_object.readf}-`);
-	}
+	}//else console.log(`not heard from you -${url_object.readf}-`);
 });
 
 //start the server.
