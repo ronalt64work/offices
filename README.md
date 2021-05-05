@@ -1,5 +1,5 @@
 # offices
-consider a matrix of filled with 1 and 0s. 1=office. 0=wall. any colliding 1 becomes part of the office. make a count of offices.
+consider a matrix filled with 1 and 0s. 1=office. 0=wall. any colliding 1 becomes part of the same -existing- office. make a count of offices.
 install nodejs.
 run app1.js 
 go to your browser and type:
