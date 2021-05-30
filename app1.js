@@ -1,10 +1,4 @@
-const http_lib 			= require('http');
-const url_lib			= require('url');
 const fs_lib			= require('fs');
-
-const hostname 			= "127.0.0.1";
-
-const port 				= "3001";
 
 var building			=[];
 var b_coord				=[];
@@ -19,11 +13,13 @@ const Rp1C		=false;
 const Rp1Cp1	=false;
 
 //declare a function to read the file.
-function lets_read_file(filename){
+function lets_read_file(filename, print=false){
 	
 	var rows = fs_lib.readFileSync(filename,'utf-8').split('\n');
-	console.log(`gathered content (${rows.length})`);
-	console.log(rows);
+	if(print){
+		console.log(`gathered content (${rows.length})`);
+		console.log(rows);
+	}
 
 	//processing the lines to create a matrix.
 	rows.forEach((line)=>{
@@ -44,10 +40,10 @@ function lets_read_file(filename){
 
 	find_offices();
 
-	print_offices();
+	if(print) print_offices();
 
-	remap_final();
-
+	if(print)remap_final();
+	return offices.length;
 }
 
 
@@ -375,26 +371,6 @@ function print_offices(){
 	});
 }
 
-//declaration only of the server itself
-const my_server = http_lib.createServer((req,res)=>{
-	//parsing the request.
-	const url_object = url_lib.parse(req.url,true).query;
-	
-	res.statusCode = 200; //ok.
-	res.setHeader('Content-type','text-plain');
-	res.end('hell at world!');
+//lets_read_file('samples/file1.txt',true);
 
-	//after sending the response, show the content of the request in console.
-	if(url_object.readf =="yes"){
-		console.log('received, will read the file');
-		lets_read_file('my_file.txt');
-	}//else console.log(`not heard from you -${url_object.readf}-`);
-});
-
-//start the server.
-my_server.listen(port,hostname,()=>{
-	console.log(`this server has started at: http://${hostname}:${port}/`);
-});
-
-
-
+module.exports=lets_read_file;
